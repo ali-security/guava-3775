@@ -306,6 +306,10 @@ public class AtomicDoubleArray implements java.io.Serializable {
     private final transient int start;
     private final int end;
 
+    private ImmutableLongArray(long[] array) {
+      this(array, 0, array.length);
+    }
+  
     private ImmutableLongArray(long[] array, int start, int end) {
       this.array = array;
       this.start = start;
