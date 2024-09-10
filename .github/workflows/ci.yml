@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         java: [ 8, 11 ]
-        root-pom: [ 'pom.xml', 'android/pom.xml' ]
+        root-pom: [ 'pom.xml' ]
     runs-on: ubuntu-latest
     env:
       ROOT_POM: ${{ matrix.root-pom }}

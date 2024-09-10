@@ -17,7 +17,6 @@ package com.google.common.io;
 import static com.google.common.base.StandardSystemProperty.JAVA_IO_TMPDIR;
 
 import com.google.common.annotations.GwtIncompatible;
-import com.google.common.annotations.J2ktIncompatible;
 import com.google.j2objc.annotations.J2ObjCIncompatible;
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +32,6 @@ import java.util.Set;
  * old Android Ice Cream Sandwich release), then this class throws an exception instead of creating
  * a file or directory that would be more accessible.
  */
-@J2ktIncompatible
 @GwtIncompatible
 @J2ObjCIncompatible
 @ElementTypesAreNonnullByDefault
