@@ -269,7 +269,7 @@ public class AtomicDoubleArray implements java.io.Serializable {
 }
 
 
-private class ImmutableLongArray implements Serializable {
+class ImmutableLongArray implements Serializable {
   private final ImmutableLongArray EMPTY = new ImmutableLongArray(new long[0]);
 
   public Builder builder() {
