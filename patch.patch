@@ -1,0 +1,222 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 936be92222..138e507fbb 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -45,6 +45,13 @@ jobs:
+       - name: 'Test'
+         shell: bash
+         run: mvn -B -P!standard-with-extra-repos verify -U -Dmaven.javadoc.skip=true -f $ROOT_POM
++      - name: Upload Jars
++        uses: actions/upload-artifact@v4
++        if: ${{ matrix.java == 8 }}
++        with:
++          name: "jars"
++          path: "**/*.jar"
++
+       - name: 'Print Surefire reports'
+         # Note: Normally a step won't run if the job has failed, but this causes it to
+         if: ${{ failure() }}
+diff --git a/README.md b/README.md
+index 8afda8fbb9..b33930f5ab 100644
+--- a/README.md
++++ b/README.md
+@@ -22,8 +22,8 @@ Guava comes in two flavors:
+ Guava's Maven group ID is `com.google.guava`, and its artifact ID is `guava`.
+ Guava provides two different "flavors": one for use on a (Java 8+) JRE and one
+ for use on Android or by any library that wants to be compatible with Android.
+-These flavors are specified in the Maven version field as either `31.1-jre` or
+-`31.1-android`. For more about depending on Guava, see
++These flavors are specified in the Maven version field as either `31.1+sp1-jre` or
++`31.1+sp1-android`. For more about depending on Guava, see
+ [using Guava in your build].
+ 
+ To add a dependency on Guava using Maven, use the following:
+@@ -32,9 +32,9 @@ To add a dependency on Guava using Maven, use the following:
+ <dependency>
+   <groupId>com.google.guava</groupId>
+   <artifactId>guava</artifactId>
+-  <version>31.1-jre</version>
++  <version>31.1+sp1-jre</version>
+   <!-- or, for Android: -->
+-  <version>31.1-android</version>
++  <version>31.1+sp1-android</version>
+ </dependency>
+ ```
+ 
+@@ -45,16 +45,16 @@ dependencies {
+   // Pick one:
+ 
+   // 1. Use Guava in your implementation only:
+-  implementation("com.google.guava:guava:31.1-jre")
++  implementation("com.google.guava:guava:31.1+sp1-jre")
+ 
+   // 2. Use Guava types in your public API:
+-  api("com.google.guava:guava:31.1-jre")
++  api("com.google.guava:guava:31.1+sp1-jre")
+ 
+   // 3. Android - Use Guava in your implementation only:
+-  implementation("com.google.guava:guava:31.1-android")
++  implementation("com.google.guava:guava:31.1+sp1-android")
+ 
+   // 4. Android - Use Guava types in your public API:
+-  api("com.google.guava:guava:31.1-android")
++  api("com.google.guava:guava:31.1+sp1-android")
+ }
+ ```
+ 
+diff --git a/android/guava-bom/pom.xml b/android/guava-bom/pom.xml
+index 736c02fd80..1c66838eaf 100644
+--- a/android/guava-bom/pom.xml
++++ b/android/guava-bom/pom.xml
+@@ -8,7 +8,7 @@
+ 
+   <groupId>com.google.guava</groupId>
+   <artifactId>guava-bom</artifactId>
+-  <version>31.1-android</version>
++  <version>31.1+sp1-android</version>
+   <packaging>pom</packaging>
+   
+   <parent>
+diff --git a/android/guava-testlib/pom.xml b/android/guava-testlib/pom.xml
+index 1fcf058676..201fffd344 100644
+--- a/android/guava-testlib/pom.xml
++++ b/android/guava-testlib/pom.xml
+@@ -5,7 +5,7 @@
+   <parent>
+     <groupId>com.google.guava</groupId>
+     <artifactId>guava-parent</artifactId>
+-    <version>31.1-android</version>
++    <version>31.1+sp1-android</version>
+   </parent>
+   <artifactId>guava-testlib</artifactId>
+   <name>Guava Testing Library</name>
+diff --git a/android/guava-tests/pom.xml b/android/guava-tests/pom.xml
+index 13a8d8dc11..98016a91e3 100644
+--- a/android/guava-tests/pom.xml
++++ b/android/guava-tests/pom.xml
+@@ -5,7 +5,7 @@
+   <parent>
+     <groupId>com.google.guava</groupId>
+     <artifactId>guava-parent</artifactId>
+-    <version>31.1-android</version>
++    <version>31.1+sp1-android</version>
+   </parent>
+   <artifactId>guava-tests</artifactId>
+   <name>Guava Unit Tests</name>
+diff --git a/android/guava/pom.xml b/android/guava/pom.xml
+index 39611d4c9e..29be116138 100644
+--- a/android/guava/pom.xml
++++ b/android/guava/pom.xml
+@@ -5,7 +5,7 @@
+   <parent>
+     <groupId>com.google.guava</groupId>
+     <artifactId>guava-parent</artifactId>
+-    <version>31.1-android</version>
++    <version>31.1+sp1-android</version>
+   </parent>
+   <artifactId>guava</artifactId>
+   <packaging>bundle</packaging>
+diff --git a/android/pom.xml b/android/pom.xml
+index 90f502138e..0bfd4d8536 100644
+--- a/android/pom.xml
++++ b/android/pom.xml
+@@ -6,7 +6,7 @@
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>com.google.guava</groupId>
+   <artifactId>guava-parent</artifactId>
+-  <version>31.1-android</version>
++  <version>31.1+sp1-android</version>
+   <packaging>pom</packaging>
+   <name>Guava Maven Parent</name>
+   <description>Parent for guava artifacts</description>
+diff --git a/guava-bom/pom.xml b/guava-bom/pom.xml
+index 1a3d98ec49..2dda976be0 100644
+--- a/guava-bom/pom.xml
++++ b/guava-bom/pom.xml
+@@ -8,7 +8,7 @@
+ 
+   <groupId>com.google.guava</groupId>
+   <artifactId>guava-bom</artifactId>
+-  <version>31.1-jre</version>
++  <version>31.1+sp1-jre</version>
+   <packaging>pom</packaging>
+   
+   <parent>
+diff --git a/guava-gwt/pom.xml b/guava-gwt/pom.xml
+index 5c93f83d82..f76577d7dd 100644
+--- a/guava-gwt/pom.xml
++++ b/guava-gwt/pom.xml
+@@ -5,7 +5,7 @@
+   <parent>
+     <groupId>com.google.guava</groupId>
+     <artifactId>guava-parent</artifactId>
+-    <version>31.1-jre</version>
++    <version>31.1+sp1-jre</version>
+   </parent>
+   <artifactId>guava-gwt</artifactId>
+   <name>Guava GWT compatible libs</name>
+diff --git a/guava-testlib/README.md b/guava-testlib/README.md
+index d4810e3a34..a756432ea6 100644
+--- a/guava-testlib/README.md
++++ b/guava-testlib/README.md
+@@ -13,7 +13,7 @@ To add a dependency on Guava testlib using Maven, use the following:
+ <dependency>
+   <groupId>com.google.guava</groupId>
+   <artifactId>guava-testlib</artifactId>
+-  <version>31.1-jre</version>
++  <version>31.1+sp1-jre</version>
+   <scope>test</scope>
+ </dependency>
+ ```
+diff --git a/guava-testlib/pom.xml b/guava-testlib/pom.xml
+index 19ce18a604..dbd284577f 100644
+--- a/guava-testlib/pom.xml
++++ b/guava-testlib/pom.xml
+@@ -5,7 +5,7 @@
+   <parent>
+     <groupId>com.google.guava</groupId>
+     <artifactId>guava-parent</artifactId>
+-    <version>31.1-jre</version>
++    <version>31.1+sp1-jre</version>
+   </parent>
+   <artifactId>guava-testlib</artifactId>
+   <name>Guava Testing Library</name>
+diff --git a/guava-tests/pom.xml b/guava-tests/pom.xml
+index b7728d8b1b..0e48c162ce 100644
+--- a/guava-tests/pom.xml
++++ b/guava-tests/pom.xml
+@@ -5,7 +5,7 @@
+   <parent>
+     <groupId>com.google.guava</groupId>
+     <artifactId>guava-parent</artifactId>
+-    <version>31.1-jre</version>
++    <version>31.1+sp1-jre</version>
+   </parent>
+   <artifactId>guava-tests</artifactId>
+   <name>Guava Unit Tests</name>
+diff --git a/guava/pom.xml b/guava/pom.xml
+index 81a2005c7a..a8e69b4c78 100644
+--- a/guava/pom.xml
++++ b/guava/pom.xml
+@@ -5,7 +5,7 @@
+   <parent>
+     <groupId>com.google.guava</groupId>
+     <artifactId>guava-parent</artifactId>
+-    <version>31.1-jre</version>
++    <version>31.1+sp1-jre</version>
+   </parent>
+   <artifactId>guava</artifactId>
+   <packaging>bundle</packaging>
+diff --git a/pom.xml b/pom.xml
+index b9bc7407d0..3b7494d296 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -6,7 +6,7 @@
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>com.google.guava</groupId>
+   <artifactId>guava-parent</artifactId>
+-  <version>31.1-jre</version>
++  <version>31.1+sp1-jre</version>
+   <packaging>pom</packaging>
+   <name>Guava Maven Parent</name>
+   <description>Parent for guava artifacts</description>

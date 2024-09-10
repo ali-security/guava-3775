@@ -45,6 +45,13 @@ jobs:
       - name: 'Test'
         shell: bash
         run: mvn -B -P!standard-with-extra-repos verify -U -Dmaven.javadoc.skip=true -f $ROOT_POM
+      - name: Upload Jars
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.java == 8 }}
+        with:
+          name: "jars"
+          path: "**/*.jar"
+
       - name: 'Print Surefire reports'
         # Note: Normally a step won't run if the job has failed, but this causes it to
         if: ${{ failure() }}
