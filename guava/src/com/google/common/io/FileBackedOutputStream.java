@@ -15,6 +15,7 @@
  */
 
 package com.google.common.io;
+import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
@@ -88,6 +89,8 @@ public final class FileBackedOutputStream extends OutputStream {
    *     #getSupplier} is finalized
    */
   public FileBackedOutputStream(int fileThreshold, boolean resetOnFinalize) {
+    checkArgument(
+      fileThreshold >= 0, "fileThreshold must be non-negative, but was %s", fileThreshold);
     this.fileThreshold = fileThreshold;
     this.resetOnFinalize = resetOnFinalize;
     memory = new MemoryOutput();
@@ -191,7 +194,7 @@ public final class FileBackedOutputStream extends OutputStream {
    */
   private void update(int len) throws IOException {
     if (file == null && (memory.getCount() + len > fileThreshold)) {
-      File temp = File.createTempFile("FileBackedOutputStream", null);
+      File temp = TempFileCreator.INSTANCE.createTempFile("FileBackedOutputStream");
       if (resetOnFinalize) {
         // Finalizers are not guaranteed to be called on system shutdown;
         // this is insurance.
