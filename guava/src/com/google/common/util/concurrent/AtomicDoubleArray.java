@@ -16,6 +16,7 @@ package com.google.common.util.concurrent;
 import static java.lang.Double.doubleToRawLongBits;
 import static java.lang.Double.longBitsToDouble;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLongArray;
 
 /**
@@ -249,7 +250,7 @@ public class AtomicDoubleArray implements java.io.Serializable {
     }
   }
   
-  private final class ImmutableLongArray implements Serializable {
+  private class ImmutableLongArray implements Serializable {
     private static final ImmutableLongArray EMPTY = new ImmutableLongArray(new long[0]);
 
     public static Builder builder() {
@@ -257,7 +258,7 @@ public class AtomicDoubleArray implements java.io.Serializable {
     }
 
 
-    public static final class Builder {
+    public class Builder {
       private long[] array;
       private int count = 0; // <= array.length
 
@@ -265,7 +266,6 @@ public class AtomicDoubleArray implements java.io.Serializable {
         array = new long[initialCapacity];
       }
 
-      @CanIgnoreReturnValue
       public Builder add(long value) {
         ensureRoomFor(1);
         array[count] = value;
