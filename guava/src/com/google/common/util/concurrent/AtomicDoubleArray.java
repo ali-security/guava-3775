@@ -17,6 +17,7 @@ import static java.lang.Double.doubleToRawLongBits;
 import static java.lang.Double.longBitsToDouble;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLongArray;
 
 /**
@@ -280,7 +281,7 @@ public class AtomicDoubleArray implements java.io.Serializable {
         }
       }
 
-      private static int expandedCapacity(int oldCapacity, int minCapacity) {
+      private int expandedCapacity(int oldCapacity, int minCapacity) {
         if (minCapacity < 0) {
           throw new AssertionError("cannot store more than MAX_VALUE elements");
         }
