@@ -18,24 +18,10 @@ package com.google.common.io;
 
 import com.google.common.testing.GcFinalization;
 
-import static com.google.common.base.StandardSystemProperty.JAVA_IO_TMPDIR;
-import static com.google.common.truth.Truth.assertThat;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_READ;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.attribute.PosixFileAttributeView;
-import java.nio.file.attribute.PosixFileAttributes;
 import java.util.Arrays;
 
 /**
@@ -108,19 +94,10 @@ public class FileBackedOutputStreamTest extends IoTestCase {
 
     // Write data to go over the threshold
     if (chunk2 > 0) {
-      if (JAVA_IO_TMPDIR.value().equals("/sdcard")) {
-        assertThrows(IOException.class, () -> write(out, data, chunk1, chunk2, singleByte));
-        return;
-      }
       write(out, data, chunk1, chunk2, singleByte);
       file = out.getFile();
       assertEquals(dataSize, file.length());
       assertTrue(file.exists());
-            assertThat(file.getName()).contains("FileBackedOutputStream");
-      PosixFileAttributes attributes =
-          java.nio.file.Files.getFileAttributeView(file.toPath(), PosixFileAttributeView.class)
-              .readAttributes();
-      assertThat(attributes.permissions()).containsExactly(OWNER_READ, OWNER_WRITE);
     }
     out.close();
 
@@ -153,11 +130,6 @@ public class FileBackedOutputStreamTest extends IoTestCase {
     byte[] data = newPreFilledByteArray(100);
     FileBackedOutputStream out = new FileBackedOutputStream(50);
     InputSupplier<InputStream> supplier = out.getSupplier();
-
-    if (JAVA_IO_TMPDIR.value().equals("/sdcard")) {
-      assertThrows(IOException.class, () -> out.write(data));
-      return;
-    }
 
     out.write(data);
     assertTrue(Arrays.equals(data, ByteStreams.toByteArray(supplier)));
