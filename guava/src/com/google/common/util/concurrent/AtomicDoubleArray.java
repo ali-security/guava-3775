@@ -251,76 +251,6 @@ public class AtomicDoubleArray implements java.io.Serializable {
     }
   }
   
-  private class ImmutableLongArray implements Serializable {
-    private final ImmutableLongArray EMPTY = new ImmutableLongArray(new long[0]);
-
-    public Builder builder() {
-      return new Builder(10);
-    }
-
-
-    public class Builder {
-      private long[] array;
-      private int count = 0; // <= array.length
-
-      Builder(int initialCapacity) {
-        array = new long[initialCapacity];
-      }
-
-      public Builder add(long value) {
-        ensureRoomFor(1);
-        array[count] = value;
-        count += 1;
-        return this;
-      }
-
-      private void ensureRoomFor(int numberToAdd) {
-        int newCount = count + numberToAdd; // TODO(kevinb): check overflow now?
-        if (newCount > array.length) {
-          array = Arrays.copyOf(array, expandedCapacity(array.length, newCount));
-        }
-      }
-
-      private int expandedCapacity(int oldCapacity, int minCapacity) {
-        if (minCapacity < 0) {
-          throw new AssertionError("cannot store more than MAX_VALUE elements");
-        }
-        // careful of overflow!
-        int newCapacity = oldCapacity + (oldCapacity >> 1) + 1;
-        if (newCapacity < minCapacity) {
-          newCapacity = Integer.highestOneBit(minCapacity - 1) << 1;
-        }
-        if (newCapacity < 0) {
-          newCapacity = Integer.MAX_VALUE; // guaranteed to be >= newCapacity
-        }
-        return newCapacity;
-      }
-
-      public ImmutableLongArray build() {
-        return count == 0 ? EMPTY : new ImmutableLongArray(array, 0, count);
-      }
-    }
-
-    @SuppressWarnings("Immutable")
-    private final long[] array;
-    private final transient int start;
-    private final int end;
-
-    private ImmutableLongArray(long[] array) {
-      this(array, 0, array.length);
-    }
-  
-    private ImmutableLongArray(long[] array, int start, int end) {
-      this.array = array;
-      this.start = start;
-      this.end = end;
-    }
-
-    public long[] toArray() {
-      return Arrays.copyOfRange(array, start, end);
-    }
-  }
-
   /**
    * Reconstitutes the instance from a stream (that is, deserializes it).
    */
@@ -335,5 +265,76 @@ public class AtomicDoubleArray implements java.io.Serializable {
       builder.add(doubleToRawLongBits(s.readDouble()));
     }
     this.longs = new AtomicLongArray(builder.build().toArray());
+  }
+}
+
+
+private class ImmutableLongArray implements Serializable {
+  private final ImmutableLongArray EMPTY = new ImmutableLongArray(new long[0]);
+
+  public Builder builder() {
+    return new Builder(10);
+  }
+
+
+  public class Builder {
+    private long[] array;
+    private int count = 0; // <= array.length
+
+    Builder(int initialCapacity) {
+      array = new long[initialCapacity];
+    }
+
+    public static Builder add(long value) {
+      ensureRoomFor(1);
+      array[count] = value;
+      count += 1;
+      return this;
+    }
+
+    private void ensureRoomFor(int numberToAdd) {
+      int newCount = count + numberToAdd; // TODO(kevinb): check overflow now?
+      if (newCount > array.length) {
+        array = Arrays.copyOf(array, expandedCapacity(array.length, newCount));
+      }
+    }
+
+    private int expandedCapacity(int oldCapacity, int minCapacity) {
+      if (minCapacity < 0) {
+        throw new AssertionError("cannot store more than MAX_VALUE elements");
+      }
+      // careful of overflow!
+      int newCapacity = oldCapacity + (oldCapacity >> 1) + 1;
+      if (newCapacity < minCapacity) {
+        newCapacity = Integer.highestOneBit(minCapacity - 1) << 1;
+      }
+      if (newCapacity < 0) {
+        newCapacity = Integer.MAX_VALUE; // guaranteed to be >= newCapacity
+      }
+      return newCapacity;
+    }
+
+    public ImmutableLongArray build() {
+      return count == 0 ? EMPTY : new ImmutableLongArray(array, 0, count);
+    }
+  }
+
+  @SuppressWarnings("Immutable")
+  private final long[] array;
+  private final transient int start;
+  private final int end;
+
+  private ImmutableLongArray(long[] array) {
+    this(array, 0, array.length);
+  }
+
+  private ImmutableLongArray(long[] array, int start, int end) {
+    this.array = array;
+    this.start = start;
+    this.end = end;
+  }
+
+  public long[] toArray() {
+    return Arrays.copyOfRange(array, start, end);
   }
 }
