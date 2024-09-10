@@ -16,6 +16,7 @@ package com.google.common.util.concurrent;
 import static java.lang.Double.doubleToRawLongBits;
 import static java.lang.Double.longBitsToDouble;
 
+import com.google.common.primitives.ImmutableLongArray;
 import java.util.concurrent.atomic.AtomicLongArray;
 
 /**
@@ -258,11 +259,10 @@ public class AtomicDoubleArray implements java.io.Serializable {
 
     // Read in array length and allocate array
     int length = s.readInt();
-    this.longs = new AtomicLongArray(length);
-
-    // Read in all elements in the proper order.
+    ImmutableLongArray.Builder builder = ImmutableLongArray.builder();
     for (int i = 0; i < length; i++) {
-      set(i, s.readDouble());
+      builder.add(doubleToRawLongBits(s.readDouble()));
     }
+    this.longs = new AtomicLongArray(builder.build().toArray());
   }
 }
