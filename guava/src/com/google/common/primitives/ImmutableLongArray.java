@@ -19,7 +19,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.base.Preconditions;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.util.AbstractList;
@@ -27,8 +26,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.RandomAccess;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.function.LongConsumer;
 import java.util.stream.LongStream;
 import javax.annotation.CheckForNull;
@@ -256,7 +253,6 @@ public final class ImmutableLongArray implements Serializable {
          * {@link ImmutableLongArray} will
          * contain.
          */
-        @CanIgnoreReturnValue
         public Builder add(long value) {
             ensureRoomFor(1);
             array[count] = value;
@@ -268,19 +264,6 @@ public final class ImmutableLongArray implements Serializable {
          * Appends {@code values}, in order, to the end of the values the built {@link
          * ImmutableLongArray} will contain.
          */
-        @CanIgnoreReturnValue
-        public Builder addAll(long[] values) {
-            ensureRoomFor(values.length);
-            System.arraycopy(values, 0, array, count, values.length);
-            count += values.length;
-            return this;
-        }
-
-        /**
-         * Appends {@code values}, in order, to the end of the values the built {@link
-         * ImmutableLongArray} will contain.
-         */
-        @CanIgnoreReturnValue
         public Builder addAll(Iterable<Long> values) {
             if (values instanceof Collection) {
                 return addAll((Collection<Long>) values);
@@ -295,7 +278,6 @@ public final class ImmutableLongArray implements Serializable {
          * Appends {@code values}, in order, to the end of the values the built {@link
          * ImmutableLongArray} will contain.
          */
-        @CanIgnoreReturnValue
         public Builder addAll(Collection<Long> values) {
             ensureRoomFor(values.size());
             for (Long value : values) {
@@ -305,26 +287,9 @@ public final class ImmutableLongArray implements Serializable {
         }
 
         /**
-         * Appends all values from {@code stream}, in order, to the end of the values
-         * the built {@link
-         * ImmutableLongArray} will contain.
-         */
-        @CanIgnoreReturnValue
-        public Builder addAll(LongStream stream) {
-            Spliterator.OfLong spliterator = stream.spliterator();
-            long size = spliterator.getExactSizeIfKnown();
-            if (size > 0) { // known *and* nonempty
-                ensureRoomFor(Ints.saturatedCast(size));
-            }
-            spliterator.forEachRemaining((LongConsumer) this::add);
-            return this;
-        }
-
-        /**
          * Appends {@code values}, in order, to the end of the values the built {@link
          * ImmutableLongArray} will contain.
          */
-        @CanIgnoreReturnValue
         public Builder addAll(ImmutableLongArray values) {
             ensureRoomFor(values.length());
             System.arraycopy(values.array, values.start, array, count, values.length());
@@ -504,10 +469,6 @@ public final class ImmutableLongArray implements Serializable {
                 : new ImmutableLongArray(array, start + startIndex, start + endIndex);
     }
 
-    private Spliterator.OfLong spliterator() {
-        return Spliterators.spliterator(array, start, end, Spliterator.IMMUTABLE | Spliterator.ORDERED);
-    }
-
     /**
      * Returns an immutable <i>view</i> of this array's values as a {@code List};
      * note that {@code
@@ -568,12 +529,6 @@ public final class ImmutableLongArray implements Serializable {
         @Override
         public List<Long> subList(int fromIndex, int toIndex) {
             return parent.subArray(fromIndex, toIndex).asList();
-        }
-
-        // The default List spliterator is not efficiently splittable
-        @Override
-        public Spliterator<Long> spliterator() {
-            return parent.spliterator();
         }
 
         @Override
