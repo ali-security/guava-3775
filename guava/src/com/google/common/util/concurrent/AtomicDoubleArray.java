@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLongArray;
 
+import com.google.common.primitives.ImmutableLongArray;
+
 /**
  * A {@code double} array in which elements may be updated atomically.
  * See the {@link java.util.concurrent.atomic} package specification
