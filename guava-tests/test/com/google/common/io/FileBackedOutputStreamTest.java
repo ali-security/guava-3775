@@ -98,6 +98,9 @@ public class FileBackedOutputStreamTest extends IoTestCase {
       file = out.getFile();
       assertEquals(dataSize, file.length());
       assertTrue(file.exists());
+      assertTrue(file.canRead());
+      assertTrue(file.canWrite());
+      assertFalse(file.canExecute());
     }
     out.close();
 
