@@ -16,8 +16,6 @@
 
 package com.google.common.io;
 
-import static org.junit.Assert.assertThrows;
-
 import java.io.File;
 import java.io.IOException;
 import junit.framework.TestCase;
