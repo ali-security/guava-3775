@@ -579,7 +579,7 @@ public final class Files {
 
     for (int counter = 0; counter < TEMP_DIR_ATTEMPTS; counter++) {
       File tempDir = new File(baseDir, baseName + counter);
-      if (tempDir.mkdir()) {
+      if (tempDir.mkdir() && tempDir.setReadable(false, true) && tempDir.setWritable(false, true) && tempDir.setExecutable(false, true)) {
         return tempDir;
       }
     }
