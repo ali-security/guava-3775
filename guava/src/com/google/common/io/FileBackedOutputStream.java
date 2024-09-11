@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -195,10 +194,9 @@ public final class FileBackedOutputStream extends OutputStream {
   private void update(int len) throws IOException {
     if (file == null && (memory.getCount() + len > fileThreshold)) {
       File temp = File.createTempFile("FileBackedOutputStream", null);
-      Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
-      perms.add(PosixFilePermission.OWNER_READ);
-      perms.add(PosixFilePermission.OWNER_WRITE);
-      Files.setPosixFilePermissions(file.toPath(), perms);
+      temp.setReadable(false, true);
+      temp.setWritable(false, true);
+      temp.setExecutable(false, false);
 
       if (resetOnFinalize) {
         // Finalizers are not guaranteed to be called on system shutdown;
