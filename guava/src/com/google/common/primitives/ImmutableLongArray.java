@@ -26,8 +26,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.RandomAccess;
-import java.util.function.LongConsumer;
-import java.util.stream.LongStream;
 import javax.annotation.CheckForNull;
 
 /**
@@ -76,14 +74,6 @@ import javax.annotation.CheckForNull;
  * ImmutableList}{@code
  * <Long>}:
  *
- * <ul>
- * <li>Improved memory compactness and locality.
- * <li>Can be queried without allocating garbage.
- * <li>Access to {@code LongStream} features (like {@link LongStream#sum}) using
- * {@code stream()}
- * instead of the awkward {@code stream().mapToLong(v -> v)}.
- * </ul>
- *
  * <p>
  * Disadvantages compared to {@code ImmutableList<Long>}:
  *
@@ -99,7 +89,6 @@ import javax.annotation.CheckForNull;
  */
 @GwtCompatible
 @Immutable
-@ElementTypesAreNonnullByDefault
 public final class ImmutableLongArray implements Serializable {
     private static final ImmutableLongArray EMPTY = new ImmutableLongArray(new long[0]);
 
@@ -186,17 +175,6 @@ public final class ImmutableLongArray implements Serializable {
             return copyOf((Collection<Long>) values);
         }
         return builder().addAll(values).build();
-    }
-
-    /**
-     * Returns an immutable array containing all the values from {@code stream}, in
-     * order.
-     */
-    public static ImmutableLongArray copyOf(LongStream stream) {
-        // Note this uses very different growth behavior from copyOf(Iterable) and the
-        // builder.
-        long[] array = stream.toArray();
-        return (array.length == 0) ? EMPTY : new ImmutableLongArray(array);
     }
 
     /**
@@ -427,21 +405,6 @@ public final class ImmutableLongArray implements Serializable {
      */
     public boolean contains(long target) {
         return indexOf(target) >= 0;
-    }
-
-    /**
-     * Invokes {@code consumer} for each value contained in this array, in order.
-     */
-    public void forEach(LongConsumer consumer) {
-        checkNotNull(consumer);
-        for (int i = start; i < end; i++) {
-            consumer.accept(array[i]);
-        }
-    }
-
-    /** Returns a stream over the values in this array, in order. */
-    public LongStream stream() {
-        return Arrays.stream(array, start, end);
     }
 
     /**
