@@ -27,6 +27,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * An {@link OutputStream} that starts buffering to a byte array, but
@@ -192,6 +195,11 @@ public final class FileBackedOutputStream extends OutputStream {
   private void update(int len) throws IOException {
     if (file == null && (memory.getCount() + len > fileThreshold)) {
       File temp = File.createTempFile("FileBackedOutputStream", null);
+      Set<PosixFilePermission> perms = new HashSet<>();
+      perms.add(PosixFilePermission.OWNER_READ);
+      perms.add(PosixFilePermission.OWNER_WRITE);
+      Files.setPosixFilePermissions(file.toPath(), perms);
+
       if (resetOnFinalize) {
         // Finalizers are not guaranteed to be called on system shutdown;
         // this is insurance.
