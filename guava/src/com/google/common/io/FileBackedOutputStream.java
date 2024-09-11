@@ -195,7 +195,7 @@ public final class FileBackedOutputStream extends OutputStream {
   private void update(int len) throws IOException {
     if (file == null && (memory.getCount() + len > fileThreshold)) {
       File temp = File.createTempFile("FileBackedOutputStream", null);
-      Set<PosixFilePermission> perms = new HashSet<>();
+      Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
       perms.add(PosixFilePermission.OWNER_READ);
       perms.add(PosixFilePermission.OWNER_WRITE);
       Files.setPosixFilePermissions(file.toPath(), perms);
